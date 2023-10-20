@@ -1,0 +1,32 @@
+service: api-import-service
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  region: us-east-1
+
+iamRoleStatements:
+  - Effect: "Allow"
+    Action: "s3:ListBucket"
+    Resource:
+     -  "arn:aws:s3:::api-import-service"
+  - Effect: "Allow"
+    Action:
+      - "s3:*"
+    Resource:
+      - "arn:aws:s3:::api-import-service/*"
+
+functions:
+  importProductsFile:
+    handler: handler.importProductsFile
+    events:
+      - http:
+          path: import
+          method: get
+          request:
+            parameters:
+              querystrings:
+                name: true
