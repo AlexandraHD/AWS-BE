@@ -29,7 +29,7 @@ module.exports.importProductsFile = async (event) => {
     }
   };
 
-  module.exports.importProductsFile = async (event) => {
+  module.exports.importFileParser = async (event) => {
     const s3 = new AWS.S3({ region: 'us-east-1' })
     try {
       for (const record of event.Records) {
@@ -44,7 +44,7 @@ module.exports.importProductsFile = async (event) => {
         s3Stream
           .pipe(csv())
           .on('data', (data) => {
-            console.log('CSV Record:', data);
+            sendMessageToSQS(data);
           })
           .on('end', () => {
             console.log('CSV parsing finished.');

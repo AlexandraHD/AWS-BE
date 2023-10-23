@@ -79,3 +79,53 @@ module.exports.createProduct = async(event) => {
     };
   }
 };
+
+module.exports.catalogBatchProcess = async (event) => {
+  try {
+    const { Records } = event;
+
+    for(const record of Records){
+      const body = JSON.parse(record.body);
+      const producParams = {
+        TableName: 'products',
+        Item: {
+          id: body.id,
+          title: body.title,
+          description: body.description,
+          price: body.price,
+        }
+      }
+      await dynamoDb.put(producParams).promise();
+
+      const snsParams = {
+        Message: JSON.stringify({
+          message: 'New product created',
+          product: body,
+        }),
+        TopicArn: 'arn:aws:sns:us-east-1:493521690512:createProductTopic'
+      };
+      await sns.publish(snsParams).promise();
+
+      const sqs = new AWS.SQS();
+      await sqs.deleteMessage({
+        QueueUrl: 'https://sqs.us-east-1.amazonaws.com/493521690512/catalogItemsQueue',
+        ReceiptHandle: record.receiptHandle,
+      }).promise();
+    }
+    
+    return {
+      statusCode: 200,
+      body: JSON.stringify ({
+        message: 'Products successfully added',
+      })
+    };
+
+  } catch(error) {
+    return {
+      statusCode:500,
+      body: JSON.stringify ({
+        message: 'products could not be added',
+      })
+    }
+  }
+};
