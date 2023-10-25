@@ -1,0 +1,22 @@
+service: authorization-service
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  region: us-east-1
+
+plugins: 
+  - serverless-dotenv-plugin
+
+custom:
+  credentials:
+    AlexandraHD: ${file(.env):AlexandraHD}
+
+functions:
+  basicAuthorizer:
+    handler: handler.basicAuthorizer
+    environment:
+      ${self:custom.credentials}

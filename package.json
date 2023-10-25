@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.1476.0",
-    "csv-parser": "^3.0.0"
+    "csv-parser": "^3.0.0",
+    "serverless-dotenv-plugin": "^6.0.0"
   }
 }

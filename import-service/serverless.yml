@@ -24,12 +24,13 @@ functions:
     handler: handler.importProductsFile
     events:
       - http:
-          path: import
+          path: /import
           method: get
           request:
             parameters:
               querystrings:
                 name: true
+          authorizer: basicAuthorizer
   importFileParser:
     handler: handler.importFileParser
     events:
